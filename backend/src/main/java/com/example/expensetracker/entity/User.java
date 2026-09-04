@@ -1,6 +1,9 @@
 package com.example.expensetracker.entity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,4 +24,7 @@ public class User {
 
     @Column(name = "email", length = 255,nullable =false , unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Category> categories = new ArrayList<>();
 }
