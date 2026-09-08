@@ -6,9 +6,12 @@ com/example/expensetracker/dto/response/UserResponse.class
 com/example/expensetracker/exception/ConflictException.class
 com/example/expensetracker/repository/UserRepository.class
 com/example/expensetracker/service/impl/CategoryServiceImpl.class
+com/example/expensetracker/controller/UserController.class
 com/example/expensetracker/mapper/UserMapper.class
 com/example/expensetracker/exception/ResourceNotFoundException.class
 com/example/expensetracker/entity/User.class
+com/example/expensetracker/controller/ExpenseController.class
+com/example/expensetracker/controller/CategoryController.class
 com/example/expensetracker/ExpenseTrackerApplication.class
 com/example/expensetracker/dto/request/CategoryRequest.class
 com/example/expensetracker/dto/response/CategoryResponse.class
