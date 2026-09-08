@@ -12,7 +12,11 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query(value="""
         SELECT *
         FROM categories
-        WHERE user_id = :userId;
+        WHERE user_id = :userId
             """, nativeQuery = true)
     List<Category> findCategoriesByUserId(@Param("userId") Integer userId);
+
+    boolean existsByNameAndUserId(String name,Integer userId);
+
+    boolean existsByNameAndUserIdAndIdNot(String name,Integer userId ,Integer categoryId);
 }

@@ -9,6 +9,7 @@ import com.example.expensetracker.dto.request.ExpenseRequest;
 import com.example.expensetracker.dto.response.ExpenseResponse;
 import com.example.expensetracker.entity.Category;
 import com.example.expensetracker.entity.Expense;
+import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.ExpenseMapper;
 import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.ExpenseRepository;
@@ -31,7 +32,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     public ExpenseResponse createExpense(ExpenseRequest expenseRequest,Integer categoryId){
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
-                () -> new RuntimeException("Category not found")
+                () -> new ResourceNotFoundException("Category not found")
             );
 
         Expense expense = expenseMapper.toEntity(expenseRequest);
@@ -55,7 +56,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     public ExpenseResponse getExpenseById(Integer expenseId){
         Expense expense = expenseRepository.findById(expenseId).
             orElseThrow(
-                () -> new RuntimeException("Expense not found")
+                () -> new ResourceNotFoundException("Expense not found")
             );
         
         return expenseMapper.toResponse(expense);
@@ -66,7 +67,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     public ExpenseResponse updateExpense(Integer expenseId,ExpenseRequest expenseRequest){
         Expense expense = expenseRepository.findById(expenseId).
             orElseThrow(
-                () -> new RuntimeException("Expesne not found")
+                () -> new ResourceNotFoundException("Expense not found")
             );
         
         expenseMapper.updateEntity(expenseRequest,expense);
@@ -79,7 +80,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     public void deleteExpenseById(Integer expenseId){
         Expense expense = expenseRepository.findById(expenseId).
             orElseThrow(
-                () -> new RuntimeException("Expesne not found")
+                () -> new ResourceNotFoundException("Expense not found")
             );
         expenseRepository.delete(expense);
     }

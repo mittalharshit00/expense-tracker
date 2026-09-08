@@ -1,15 +1,19 @@
 com/example/expensetracker/dto/response/ExpenseResponse.class
 com/example/expensetracker/service/impl/UserServiceImpl.class
 com/example/expensetracker/mapper/ExpenseMapperImpl.class
+com/example/expensetracker/exception/BadRequestException.class
 com/example/expensetracker/dto/response/UserResponse.class
+com/example/expensetracker/exception/ConflictException.class
 com/example/expensetracker/repository/UserRepository.class
 com/example/expensetracker/service/impl/CategoryServiceImpl.class
 com/example/expensetracker/mapper/UserMapper.class
+com/example/expensetracker/exception/ResourceNotFoundException.class
 com/example/expensetracker/entity/User.class
 com/example/expensetracker/ExpenseTrackerApplication.class
 com/example/expensetracker/dto/request/CategoryRequest.class
 com/example/expensetracker/dto/response/CategoryResponse.class
 com/example/expensetracker/dto/request/ExpenseRequest.class
+com/example/expensetracker/exception/GlobalExceptionHandler.class
 com/example/expensetracker/service/impl/ExpenseServiceImpl.class
 com/example/expensetracker/entity/Category.class
 com/example/expensetracker/entity/Expense.class
@@ -22,4 +26,5 @@ com/example/expensetracker/service/CategoryService.class
 com/example/expensetracker/mapper/UserMapperImpl.class
 com/example/expensetracker/mapper/CategoryMapperImpl.class
 com/example/expensetracker/mapper/CategoryMapper.class
+com/example/expensetracker/dto/response/ErrorResponse.class
 com/example/expensetracker/repository/CategoryRepository.class

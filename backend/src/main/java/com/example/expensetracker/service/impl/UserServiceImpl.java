@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.expensetracker.dto.request.UserRequest;
 import com.example.expensetracker.dto.response.UserResponse;
 import com.example.expensetracker.entity.User;
+import com.example.expensetracker.exception.ConflictException;
+import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.UserMapper;
 import com.example.expensetracker.repository.UserRepository;
 import com.example.expensetracker.service.UserService;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     @Transactional 
     @Override
     public UserResponse createUser(UserRequest userRequest){
+        if(userRepository.existsByEmail(userRequest.getEmail())){
+            throw new ConflictException("Email is already associated with another user");
+        }
         User user = userMapper.toEntity(userRequest);
         User savedUser =userRepository.save(user);
         return userMapper.toResponse(savedUser);
@@ -34,7 +39,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserById(Integer userId){
         User user = userRepository.findById(userId)
             .orElseThrow(
-                () -> new RuntimeException("User not found"));
+                () -> new ResourceNotFoundException("User not found"));
         return userMapper.toResponse(user);
     }
 
@@ -52,18 +57,23 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(Integer userId, UserRequest userRequest){
         User user = userRepository.findById(userId)
             .orElseThrow(
-                () -> new RuntimeException("User not found"));
+                () -> new ResourceNotFoundException("User not found"));
+
+        if(userRepository.existsByEmailAndIdNot(userRequest.getEmail(),userId)){
+            throw new ConflictException("Email is already associated with another user");
+        }
         userMapper.updateEntity(userRequest, user);
         return userMapper.toResponse(user);
         
 
     }
     
+    @Override
     @Transactional
     public void deleteUser(Integer userId){
         User user = userRepository.findById(userId)
             .orElseThrow(
-                () -> new RuntimeException("User not found"));
+                () -> new ResourceNotFoundException("User not found"));
         userRepository.delete(user);
     }
 }

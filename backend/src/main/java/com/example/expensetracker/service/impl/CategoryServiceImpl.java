@@ -4,6 +4,8 @@ import com.example.expensetracker.dto.request.CategoryRequest;
 import com.example.expensetracker.dto.response.CategoryResponse;
 import com.example.expensetracker.entity.Category;
 import com.example.expensetracker.entity.User;
+import com.example.expensetracker.exception.ConflictException;
+import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.CategoryMapper;
 import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.UserRepository;
@@ -29,8 +31,11 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse createCategory(CategoryRequest categoryRequest,Integer userId){
         User user = userRepository.findById(userId)
             .orElseThrow(
-                () -> new RuntimeException("User not found"));
+                () -> new ResourceNotFoundException("User not found"));
         
+        if(categoryRepository.existsByNameAndUserId(categoryRequest.getName(), userId)){
+            throw new ConflictException("Category already exists for this user");
+        }
         Category category = categoryMapper.toEntity(categoryRequest);
         category.setUser(user);
         Category savedCategory = categoryRepository.save(category);
@@ -51,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryById(Integer categoryId){
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
-                () -> new RuntimeException("category not found")
+                () -> new ResourceNotFoundException("category not found")
             );
 
         return categoryMapper.toResponse(category);
@@ -62,8 +67,14 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse updateCategory(Integer categoryId,CategoryRequest categoryRequest){
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
-                () -> new RuntimeException("category not found")
+                () -> new ResourceNotFoundException("category not found")
             );
+        
+        Integer userId = category.getUser().getId();
+
+        if(categoryRepository.existsByNameAndUserIdAndIdNot(categoryRequest.getName(), userId,categoryId)){
+            throw new ConflictException("Category already exists for this user");
+        }
         
         categoryMapper.updateEntity(categoryRequest,category);
         return categoryMapper.toResponse(category);
@@ -75,7 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategoryById(Integer categoryId){
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
-                () -> new RuntimeException("category not found")
+                () -> new ResourceNotFoundException("category not found")
             );
     
         categoryRepository.delete(category);
