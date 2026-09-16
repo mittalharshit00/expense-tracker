@@ -2,16 +2,20 @@ package com.example.expensetracker.service.impl;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.expensetracker.dto.request.UserRequest;
+import com.example.expensetracker.dto.request.UserCreateRequest;
+import com.example.expensetracker.dto.request.UserUpdateRequest;
 import com.example.expensetracker.dto.response.UserResponse;
 import com.example.expensetracker.entity.User;
+import com.example.expensetracker.enums.Role;
 import com.example.expensetracker.exception.ConflictException;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.UserMapper;
 import com.example.expensetracker.repository.UserRepository;
+import com.example.expensetracker.service.AuthorizationService;
 import com.example.expensetracker.service.UserService;
 
 import lombok.AllArgsConstructor;
@@ -22,14 +26,19 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthorizationService ownershipValidatonService;
 
     @Transactional 
     @Override
-    public UserResponse createUser(UserRequest userRequest){
-        if(userRepository.existsByEmail(userRequest.getEmail())){
+    public UserResponse createUser(UserCreateRequest userCreateRequest){
+        if(userRepository.existsByEmail(userCreateRequest.getEmail())){
             throw new ConflictException("Email is already associated with another user");
         }
-        User user = userMapper.toEntity(userRequest);
+        User user = userMapper.toEntity(userCreateRequest);
+        String encodedPassword = passwordEncoder.encode(userCreateRequest.getPassword());
+        user.setPasswordHash(encodedPassword);
+        user.setRole(Role.USER);
         User savedUser =userRepository.save(user);
         return userMapper.toResponse(savedUser);
     }
@@ -40,6 +49,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
+        
+        ownershipValidatonService.validateUserAccess(userId);
+
         return userMapper.toResponse(user);
     }
 
@@ -54,15 +66,17 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override 
-    public UserResponse updateUser(Integer userId, UserRequest userRequest){
+    public UserResponse updateUser(Integer userId, UserUpdateRequest userUpdateRequest){
         User user = userRepository.findById(userId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
+        
+        ownershipValidatonService.validateUserAccess(userId);
 
-        if(userRepository.existsByEmailAndIdNot(userRequest.getEmail(),userId)){
+        if(userRepository.existsByEmailAndIdNot(userUpdateRequest.getEmail(),userId)){
             throw new ConflictException("Email is already associated with another user");
         }
-        userMapper.updateEntity(userRequest, user);
+        userMapper.updateEntity(userUpdateRequest, user);
         return userMapper.toResponse(user);
         
 
@@ -74,6 +88,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
+
+        ownershipValidatonService.validateUserAccess(userId);
+
         userRepository.delete(user);
     }
 }

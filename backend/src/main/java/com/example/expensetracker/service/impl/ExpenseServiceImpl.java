@@ -14,6 +14,7 @@ import com.example.expensetracker.mapper.ExpenseMapper;
 import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.ExpenseRepository;
 import com.example.expensetracker.service.ExpenseService;
+import com.example.expensetracker.service.AuthorizationService;
 
 import lombok.AllArgsConstructor;
 
@@ -23,8 +24,8 @@ public class ExpenseServiceImpl implements ExpenseService{
 
     private final ExpenseRepository expenseRepository;
     private final CategoryRepository categoryRepository;
-
     private final ExpenseMapper expenseMapper;
+    private final AuthorizationService ownershipValidationService;
     
 
     @Override 
@@ -34,6 +35,8 @@ public class ExpenseServiceImpl implements ExpenseService{
             .orElseThrow(
                 () -> new ResourceNotFoundException("Category not found")
             );
+
+        ownershipValidationService.validateCategoryAccess(category);
 
         Expense expense = expenseMapper.toEntity(expenseRequest);
         expense.setCategory(category);
@@ -45,6 +48,13 @@ public class ExpenseServiceImpl implements ExpenseService{
     @Override 
     @Transactional(readOnly = true)
     public List<ExpenseResponse> getAllExpensesForCategory(Integer categoryId){
+        Category category = categoryRepository.findById(categoryId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Category not found")
+            );
+
+        ownershipValidationService.validateCategoryAccess(category);
+
         List<Expense> expenses = expenseRepository.getAllExpensesForCategory(categoryId);
         return expenses.stream()
             .map(expenseMapper::toResponse)
@@ -59,6 +69,8 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Expense not found")
             );
         
+        ownershipValidationService.validateExpenseAccess(expense);
+
         return expenseMapper.toResponse(expense);
     }
 
@@ -70,6 +82,8 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Expense not found")
             );
         
+        ownershipValidationService.validateExpenseAccess(expense);
+
         expenseMapper.updateEntity(expenseRequest,expense);
 
         return expenseMapper.toResponse(expense);
@@ -82,6 +96,9 @@ public class ExpenseServiceImpl implements ExpenseService{
             orElseThrow(
                 () -> new ResourceNotFoundException("Expense not found")
             );
+        
+        ownershipValidationService.validateExpenseAccess(expense);
+
         expenseRepository.delete(expense);
     }
 }

@@ -4,6 +4,8 @@ package com.example.expensetracker.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.expensetracker.enums.Role;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder 
 @Table(name = "users")
 public class User {
     
@@ -24,6 +27,13 @@ public class User {
 
     @Column(name = "email", length = 255,nullable =false , unique = true)
     private String email;
+
+    @Column(name ="password_hash",length =100,nullable =false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="role",length = 50,nullable = false)
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();

@@ -3,7 +3,8 @@ package com.example.expensetracker.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.expensetracker.dto.request.UserRequest;
+import com.example.expensetracker.dto.request.UserCreateRequest;
+import com.example.expensetracker.dto.request.UserUpdateRequest;
 import com.example.expensetracker.service.UserService;
 import com.example.expensetracker.dto.response.UserResponse;
 
@@ -30,8 +31,8 @@ public class UserController {
 
     @PostMapping 
     public ResponseEntity<UserResponse> createUser(
-        @Valid @RequestBody UserRequest userRequest){
-            UserResponse response = userService.createUser(userRequest);
+        @Valid @RequestBody UserCreateRequest userCreateRequest){
+            UserResponse response = userService.createUser(userCreateRequest);
 
             return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -56,7 +57,7 @@ public class UserController {
     @PutMapping("{userId}")
     public ResponseEntity<UserResponse> updateUser(
         @PathVariable Integer userId,
-        @Valid @RequestBody UserRequest request
+        @Valid @RequestBody UserUpdateRequest request
     ){
         UserResponse response = userService.updateUser(userId, request);
         return ResponseEntity.ok(response);

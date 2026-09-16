@@ -4,7 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.example.expensetracker.dto.request.UserRequest;
+import com.example.expensetracker.dto.request.UserCreateRequest;
+import com.example.expensetracker.dto.request.UserUpdateRequest;
 import com.example.expensetracker.dto.response.UserResponse;
 import com.example.expensetracker.entity.User;
 
@@ -13,11 +14,15 @@ public interface UserMapper {
 
     @Mapping(target ="id", ignore =true)
     @Mapping(target ="categories", ignore =true)
-    User toEntity(UserRequest userRequest);
+    @Mapping(target ="passwordHash",ignore =true)
+    @Mapping(target = "role" , ignore = true)
+    User toEntity(UserCreateRequest userCreateRequest);
 
     @Mapping(target ="id", ignore =true)
     @Mapping(target ="categories", ignore =true)
-    void updateEntity(UserRequest userRequest, @MappingTarget User user);
+    @Mapping(target ="passwordHash",ignore =true)
+    @Mapping(target = "role" , ignore = true)
+    void updateEntity(UserUpdateRequest userUpdateRequest, @MappingTarget User user);
 
     UserResponse toResponse(User user);
     

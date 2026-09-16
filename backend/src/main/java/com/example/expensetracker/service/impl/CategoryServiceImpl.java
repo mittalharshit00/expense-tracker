@@ -10,6 +10,7 @@ import com.example.expensetracker.mapper.CategoryMapper;
 import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.UserRepository;
 import com.example.expensetracker.service.CategoryService;
+import com.example.expensetracker.service.AuthorizationService;
 
 import java.util.List;
 
@@ -25,13 +26,17 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final CategoryMapper categoryMapper;
+    private final AuthorizationService ownershipValidationService;
 
     @Override
     @Transactional 
     public CategoryResponse createCategory(CategoryRequest categoryRequest,Integer userId){
+
         User user = userRepository.findById(userId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
+
+        ownershipValidationService.validateUserAccess(userId);
         
         if(categoryRepository.existsByNameAndUserId(categoryRequest.getName(), userId)){
             throw new ConflictException("Category already exists for this user");
@@ -45,6 +50,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategoriesForUser(Integer userId){
+       
+        ownershipValidationService.validateUserAccess(userId);
+
         List<Category> categories = categoryRepository.findCategoriesByUserId(userId);
         return categories.stream()
             .map(categoryMapper::toResponse)
@@ -54,10 +62,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Integer categoryId){
+
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("category not found")
             );
+
+        ownershipValidationService.validateCategoryAccess(category);
 
         return categoryMapper.toResponse(category);
     }
@@ -70,6 +81,8 @@ public class CategoryServiceImpl implements CategoryService {
                 () -> new ResourceNotFoundException("category not found")
             );
         
+        ownershipValidationService.validateCategoryAccess(category);
+
         Integer userId = category.getUser().getId();
 
         if(categoryRepository.existsByNameAndUserIdAndIdNot(categoryRequest.getName(), userId,categoryId)){
@@ -89,6 +102,8 @@ public class CategoryServiceImpl implements CategoryService {
                 () -> new ResourceNotFoundException("category not found")
             );
     
+        ownershipValidationService.validateCategoryAccess(category);
+        
         categoryRepository.delete(category);
     }
 }

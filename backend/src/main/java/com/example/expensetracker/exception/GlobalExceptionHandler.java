@@ -104,4 +104,20 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.CONFLICT)
             .body(response);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException exception,HttpServletRequest request){
+        ErrorResponse response = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.FORBIDDEN.value(),
+            HttpStatus.FORBIDDEN.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+
+        return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .body(response);
+    }
 }
