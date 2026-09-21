@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final CategoryMapper categoryMapper;
-    private final AuthorizationService ownershipValidationService;
+    private final AuthorizationService authorizationService;
 
     @Override
     @Transactional 
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
 
-        ownershipValidationService.validateUserAccess(userId);
+        authorizationService.validateUserAccess(userId);
         
         if(categoryRepository.existsByNameAndUserId(categoryRequest.getName(), userId)){
             throw new ConflictException("Category already exists for this user");
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategoriesForUser(Integer userId){
        
-        ownershipValidationService.validateUserAccess(userId);
+        authorizationService.validateUserAccess(userId);
 
         List<Category> categories = categoryRepository.findCategoriesByUserId(userId);
         return categories.stream()
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
                 () -> new ResourceNotFoundException("category not found")
             );
 
-        ownershipValidationService.validateCategoryAccess(category);
+        authorizationService.validateCategoryAccess(category);
 
         return categoryMapper.toResponse(category);
     }
@@ -81,7 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
                 () -> new ResourceNotFoundException("category not found")
             );
         
-        ownershipValidationService.validateCategoryAccess(category);
+        authorizationService.validateCategoryAccess(category);
 
         Integer userId = category.getUser().getId();
 
@@ -102,7 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
                 () -> new ResourceNotFoundException("category not found")
             );
     
-        ownershipValidationService.validateCategoryAccess(category);
+        authorizationService.validateCategoryAccess(category);
         
         categoryRepository.delete(category);
     }

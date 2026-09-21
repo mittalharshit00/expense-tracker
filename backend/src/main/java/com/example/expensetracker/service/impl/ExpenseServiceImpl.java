@@ -25,7 +25,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     private final ExpenseRepository expenseRepository;
     private final CategoryRepository categoryRepository;
     private final ExpenseMapper expenseMapper;
-    private final AuthorizationService ownershipValidationService;
+    private final AuthorizationService authorizationService;
     
 
     @Override 
@@ -36,7 +36,7 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Category not found")
             );
 
-        ownershipValidationService.validateCategoryAccess(category);
+        authorizationService.validateCategoryAccess(category);
 
         Expense expense = expenseMapper.toEntity(expenseRequest);
         expense.setCategory(category);
@@ -53,7 +53,7 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Category not found")
             );
 
-        ownershipValidationService.validateCategoryAccess(category);
+        authorizationService.validateCategoryAccess(category);
 
         List<Expense> expenses = expenseRepository.getAllExpensesForCategory(categoryId);
         return expenses.stream()
@@ -69,7 +69,7 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Expense not found")
             );
         
-        ownershipValidationService.validateExpenseAccess(expense);
+        authorizationService.validateExpenseAccess(expense);
 
         return expenseMapper.toResponse(expense);
     }
@@ -82,7 +82,7 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Expense not found")
             );
         
-        ownershipValidationService.validateExpenseAccess(expense);
+        authorizationService.validateExpenseAccess(expense);
 
         expenseMapper.updateEntity(expenseRequest,expense);
 
@@ -97,7 +97,7 @@ public class ExpenseServiceImpl implements ExpenseService{
                 () -> new ResourceNotFoundException("Expense not found")
             );
         
-        ownershipValidationService.validateExpenseAccess(expense);
+        authorizationService.validateExpenseAccess(expense);
 
         expenseRepository.delete(expense);
     }

@@ -1,21 +1,39 @@
-services :
-  
+services:
+
   mysql:
+    image: mysql:8.4
 
-    image : mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: Root123
+      MYSQL_DATABASE: expense_tracker
+      MYSQL_USER: expense
+      MYSQL_PASSWORD: tracker
 
-    environment :
-      MYSQL_ROOT_PASSWORD : Root123
-      MYSQL_DATABASE : expense_tracker
-      MYSQL_USER : expense
-      MYSQL_PASSWORD : tracker
-
-    ports :
+    ports:
       - "3306:3306"
 
-    volumes :
+    volumes:
       - expense_mysql_data:/var/lib/mysql
 
 
-volumes :
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: expense-tracker-keycloak
+
+    command:
+      - start-dev
+
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+
+    ports:
+      - "8081:8080"
+
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
+
+volumes:
   expense_mysql_data:
+  keycloak_data:

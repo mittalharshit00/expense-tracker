@@ -16,12 +16,14 @@ public interface UserMapper {
     @Mapping(target ="categories", ignore =true)
     @Mapping(target ="passwordHash",ignore =true)
     @Mapping(target = "role" , ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     User toEntity(UserCreateRequest userCreateRequest);
 
     @Mapping(target ="id", ignore =true)
     @Mapping(target ="categories", ignore =true)
     @Mapping(target ="passwordHash",ignore =true)
     @Mapping(target = "role" , ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     void updateEntity(UserUpdateRequest userUpdateRequest, @MappingTarget User user);
 
     UserResponse toResponse(User user);

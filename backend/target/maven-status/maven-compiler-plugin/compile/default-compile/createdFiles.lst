@@ -18,6 +18,7 @@ com/example/expensetracker/service/impl/AuthorizationServiceImpl.class
 com/example/expensetracker/dto/request/ExpenseRequest.class
 com/example/expensetracker/enums/Role.class
 com/example/expensetracker/entity/Category.class
+com/example/expensetracker/config/CorsConfig.class
 com/example/expensetracker/entity/User$UserBuilder.class
 com/example/expensetracker/repository/ExpenseRepository.class
 com/example/expensetracker/service/ExpenseService.class
@@ -36,6 +37,7 @@ com/example/expensetracker/exception/ConflictException.class
 com/example/expensetracker/service/impl/CurrentUserServiceImpl.class
 com/example/expensetracker/exception/ResourceNotFoundException.class
 com/example/expensetracker/controller/ExpenseController.class
+com/example/expensetracker/dto/request/ChangePasswordRequest.class
 com/example/expensetracker/controller/AuthController.class
 com/example/expensetracker/controller/CategoryController.class
 com/example/expensetracker/dto/request/UserCreateRequest$UserCreateRequestBuilder.class

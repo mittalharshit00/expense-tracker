@@ -6,20 +6,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.expensetracker.dto.request.ChangePasswordRequest;
 import com.example.expensetracker.dto.request.UserCreateRequest;
 import com.example.expensetracker.dto.request.UserUpdateRequest;
 import com.example.expensetracker.dto.response.UserResponse;
 import com.example.expensetracker.entity.User;
 import com.example.expensetracker.enums.Role;
+import com.example.expensetracker.exception.BadRequestException;
 import com.example.expensetracker.exception.ConflictException;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.UserMapper;
 import com.example.expensetracker.repository.UserRepository;
 import com.example.expensetracker.service.AuthorizationService;
+import com.example.expensetracker.service.CurrentUserService;
 import com.example.expensetracker.service.UserService;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j 
 @Service 
 @AllArgsConstructor  
 public class UserServiceImpl implements UserService {
@@ -27,7 +32,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final AuthorizationService ownershipValidatonService;
+    private final AuthorizationService authorizationService;
+    private final CurrentUserService currentUserService;
 
     @Transactional 
     @Override
@@ -36,9 +42,12 @@ public class UserServiceImpl implements UserService {
             throw new ConflictException("Email is already associated with another user");
         }
         User user = userMapper.toEntity(userCreateRequest);
+
         String encodedPassword = passwordEncoder.encode(userCreateRequest.getPassword());
         user.setPasswordHash(encodedPassword);
         user.setRole(Role.USER);
+        user.setEnabled(true);
+        
         User savedUser =userRepository.save(user);
         return userMapper.toResponse(savedUser);
     }
@@ -50,7 +59,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
         
-        ownershipValidatonService.validateUserAccess(userId);
+        authorizationService.validateUserAccess(userId);
 
         return userMapper.toResponse(user);
     }
@@ -71,7 +80,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
         
-        ownershipValidatonService.validateUserAccess(userId);
+        authorizationService.validateUserAccess(userId);
 
         if(userRepository.existsByEmailAndIdNot(userUpdateRequest.getEmail(),userId)){
             throw new ConflictException("Email is already associated with another user");
@@ -89,8 +98,32 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
 
-        ownershipValidatonService.validateUserAccess(userId);
+        authorizationService.validateUserAccess(userId);
 
         userRepository.delete(user);
     }
+
+    @Override
+    @Transactional 
+    public void  changePassword(ChangePasswordRequest request){
+        User user = currentUserService.getCurrentUser();
+        if(!passwordEncoder.matches(request.getCurrPassword(), user.getPasswordHash())){
+            log.warn("Password change failed. userId={}", user.getId());
+            throw new BadRequestException("Current Password is invalid");
+        }
+
+        if (request.getCurrPassword().equals(request.getNewPassword())){
+            log.warn("Password change failed. userId={}", user.getId());
+            throw new BadRequestException("New password must be different from current password");
+        }
+
+        String encodePass = passwordEncoder.encode(request.getNewPassword());
+
+        user.setPasswordHash(encodePass);
+
+        userRepository.save(user);
+        log.info("Password changed successfully. userId={}", user.getId());
+    }
+
+
 }

@@ -24,6 +24,7 @@ public class SecurityConfig {
         
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)

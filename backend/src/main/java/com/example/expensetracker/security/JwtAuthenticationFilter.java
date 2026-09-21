@@ -7,15 +7,20 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
 
 import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component 
 @AllArgsConstructor 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -43,7 +48,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String userName = null;
         try{
             userName = jwtService.extractUserName(jwt);
-        }catch(JwtException e){
+        }catch(SignatureException e){
+            log.warn("Jwt signature verification failed");
+            filterChain.doFilter(request, response);
+            return ;
+        }catch(ExpiredJwtException e){
+             log.warn("JWT Expired");
+            filterChain.doFilter(request, response);
+            return ;
+        }catch(MalformedJwtException e){
+             log.warn("JWT Malformed");
             filterChain.doFilter(request, response);
             return ;
         }
@@ -51,6 +65,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null ){
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+
+            if(!userDetails.isEnabled()){
+                log.warn("Current User is disabled");
+            filterChain.doFilter(request, response);
+            return ;
+            }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,

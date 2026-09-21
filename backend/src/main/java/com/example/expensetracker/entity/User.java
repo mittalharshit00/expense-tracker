@@ -35,6 +35,10 @@ public class User {
     @Column(name ="role",length = 50,nullable = false)
     private Role role;
 
+    @Column(name ="enabled",length =5 ,nullable = false)
+    private boolean enabled;
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 }

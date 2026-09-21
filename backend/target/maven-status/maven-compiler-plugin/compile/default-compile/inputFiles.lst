@@ -1,10 +1,12 @@
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/ExpenseTrackerApplication.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/config/AdminDataInitializer.java
+/home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/config/CorsConfig.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/controller/AuthController.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/controller/CategoryController.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/controller/ExpenseController.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/controller/UserController.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/dto/request/CategoryRequest.java
+/home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/dto/request/ChangePasswordRequest.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/dto/request/ExpenseRequest.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/dto/request/LoginRequest.java
 /home/adam/Documents/expense-tracker/backend/src/main/java/com/example/expensetracker/dto/request/UserCreateRequest.java
