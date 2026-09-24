@@ -17,9 +17,6 @@ spring:
         jwt:
           issuer-uri: http://localhost:8081/realms/expense-tracker
 
-app:
-  security:
-    jwt-secret: ${JWT_SECRET}
 
     
 

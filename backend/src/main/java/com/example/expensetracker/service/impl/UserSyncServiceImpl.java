@@ -48,7 +48,7 @@ public class UserSyncServiceImpl implements UserSyncService {
             .orElseGet(() -> createUser(jwt));
 
         userRepository.save(user);
-
+ 
         return userMapper.toResponse(user);
 
     }
