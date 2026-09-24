@@ -4,8 +4,6 @@ package com.example.expensetracker.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.expensetracker.enums.Role;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,15 +26,8 @@ public class User {
     @Column(name = "email", length = 255,nullable =false , unique = true)
     private String email;
 
-    @Column(name ="password_hash",length =100,nullable =false)
-    private String passwordHash;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name ="role",length = 50,nullable = false)
-    private Role role;
-
-    @Column(name ="enabled",length =5 ,nullable = false)
-    private boolean enabled;
+    @Column(name ="keycloak_user_id" , length =255 ,unique = true)
+    private String keycloakId;
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

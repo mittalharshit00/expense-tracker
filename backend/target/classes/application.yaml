@@ -11,6 +11,12 @@ spring:
     hibernate:
       ddl-auto : validate
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/expense-tracker
+
 app:
   security:
     jwt-secret: ${JWT_SECRET}

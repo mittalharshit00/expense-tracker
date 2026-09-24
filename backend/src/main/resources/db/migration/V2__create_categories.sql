@@ -4,5 +4,5 @@ CREATE TABLE categories (
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) 
     ON DELETE CASCADE,
-    CONSTRAINT category_unique UNIQUE (name,user_id)
+    CONSTRAINT category_unique UNIQUE (user_id,name)
 );

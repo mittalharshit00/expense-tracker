@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.expensetracker.dto.request.UserCreateRequest;
 import com.example.expensetracker.dto.request.UserUpdateRequest;
 import com.example.expensetracker.service.UserService;
+import com.example.expensetracker.service.UserSyncService;
 import com.example.expensetracker.dto.response.UserResponse;
 
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UserController {
 
     private final UserService userService;
+    private final UserSyncService userSyncService;
 
     @PostMapping 
     public ResponseEntity<UserResponse> createUser(
@@ -71,4 +73,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     
+    @PostMapping("/sync")
+    public ResponseEntity<UserResponse> syncUser(){
+        UserResponse response = userSyncService.syncUser();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }

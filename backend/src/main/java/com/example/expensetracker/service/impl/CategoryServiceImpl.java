@@ -32,11 +32,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional 
     public CategoryResponse createCategory(CategoryRequest categoryRequest,Integer userId){
 
+        authorizationService.validateUserAccess(userId);
         User user = userRepository.findById(userId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
-
-        authorizationService.validateUserAccess(userId);
         
         if(categoryRepository.existsByNameAndUserId(categoryRequest.getName(), userId)){
             throw new ConflictException("Category already exists for this user");
