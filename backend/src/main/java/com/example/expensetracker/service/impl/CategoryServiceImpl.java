@@ -5,6 +5,7 @@ import com.example.expensetracker.dto.response.CategoryResponse;
 import com.example.expensetracker.entity.Category;
 import com.example.expensetracker.entity.User;
 import com.example.expensetracker.exception.ConflictException;
+import com.example.expensetracker.exception.BadRequestException;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.mapper.CategoryMapper;
 import com.example.expensetracker.repository.CategoryRepository;
@@ -12,8 +13,8 @@ import com.example.expensetracker.repository.UserRepository;
 import com.example.expensetracker.service.CategoryService;
 import com.example.expensetracker.service.AuthorizationService;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,14 +49,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategoriesForUser(Integer userId){
+    public Page<CategoryResponse> getAllCategoriesForUser(Integer userId,Pageable pageable){
        
+        if(pageable.getPageNumber() < 0 || pageable.getPageSize() >10) throw new BadRequestException("Invalid Pagination attributes");
         authorizationService.validateUserAccess(userId);
 
-        List<Category> categories = categoryRepository.findCategoriesByUserId(userId);
-        return categories.stream()
-            .map(categoryMapper::toResponse)
-            .toList();
+        Page<Category> categories = categoryRepository.findCategoriesByUserId(userId,pageable);
+        return categories.map(categoryMapper::toResponse);
     }
 
     @Override

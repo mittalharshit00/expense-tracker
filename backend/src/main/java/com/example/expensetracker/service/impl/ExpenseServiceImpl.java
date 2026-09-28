@@ -1,7 +1,5 @@
 package com.example.expensetracker.service.impl;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +13,9 @@ import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.ExpenseRepository;
 import com.example.expensetracker.service.ExpenseService;
 import com.example.expensetracker.service.AuthorizationService;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import lombok.AllArgsConstructor;
 
@@ -47,7 +48,7 @@ public class ExpenseServiceImpl implements ExpenseService{
 
     @Override 
     @Transactional(readOnly = true)
-    public List<ExpenseResponse> getAllExpensesForCategory(Integer categoryId){
+    public Page<ExpenseResponse> getAllExpensesForCategory(Integer categoryId , Pageable pageable){
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(
                 () -> new ResourceNotFoundException("Category not found")
@@ -55,10 +56,8 @@ public class ExpenseServiceImpl implements ExpenseService{
 
         authorizationService.validateCategoryAccess(category);
 
-        List<Expense> expenses = expenseRepository.getAllExpensesForCategory(categoryId);
-        return expenses.stream()
-            .map(expenseMapper::toResponse)
-            .toList();
+        Page<Expense> expenses = expenseRepository.findByCategoryId(categoryId,pageable);
+        return expenses.map(expenseMapper::toResponse);
     }
 
     @Override 

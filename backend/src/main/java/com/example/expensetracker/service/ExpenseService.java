@@ -1,15 +1,16 @@
 package com.example.expensetracker.service;
 
-import java.util.List;
-
 import com.example.expensetracker.dto.request.ExpenseRequest;
 import com.example.expensetracker.dto.response.ExpenseResponse;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 public interface ExpenseService {
     
     ExpenseResponse createExpense(ExpenseRequest expenseRequest,Integer categoryId);
 
-    List<ExpenseResponse> getAllExpensesForCategory(Integer categoryId);
+    Page<ExpenseResponse> getAllExpensesForCategory(Integer categoryId, Pageable pageable);
 
     ExpenseResponse getExpenseById(Integer expenseId);
 

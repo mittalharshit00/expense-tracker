@@ -1,7 +1,5 @@
 package com.example.expensetracker.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.example.expensetracker.dto.request.ExpenseRequest;
 import com.example.expensetracker.dto.response.ExpenseResponse;
@@ -39,10 +41,13 @@ public class ExpenseController {
     }
 
     @GetMapping("/categories/{categoryId}/expenses")
-    public ResponseEntity<List<ExpenseResponse>> getAllExpensesForCategory(
+    public ResponseEntity<Page<ExpenseResponse>> getAllExpensesForCategory(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
         @PathVariable Integer categoryId
     ){
-        List<ExpenseResponse> response = expenseService.getAllExpensesForCategory(categoryId);
+        Pageable pageable = PageRequest.of(page,size);
+        Page<ExpenseResponse> response = expenseService.getAllExpensesForCategory(categoryId,pageable);
         return ResponseEntity.ok(response);
     }
 
